@@ -1,14 +1,36 @@
-import React from "react";
-import { View, Text } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, FlatList } from "react-native";
 import styles from "./styles";
-export default function Spaceships({navigation}) {
 
+function mapItems(items) {
+  return items.map((item) => ({
+    key: item.uid,      
+    value: item.name     
+  }));
+}
+
+export default function Spaceships({ navigation }) {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    fetch("https://www.swapi.tech/api/starships/")
+      .then((resp) => resp.json())
+      .then(({ results }) => {
+        const mapped = mapItems(results);
+        setData(mapped);
+      })
+      .catch((err) => console.error("Fetch failed:", err));
+  }, []);
 
   return (
     <View style={styles.container}>
-       
-        <Text >Spaceships</Text>
-       
+      <FlatList
+        data={data}
+        renderItem={({ item }) => (
+          <Text style={styles.item}>{item.value}</Text>
+        )}
+      />
     </View>
   );
 }
+
