@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Modal, Button, TextInput, ScrollView } from "react-native";
+import { View, Text, Modal, TextInput, ScrollView } from "react-native";
 import styles from "./styles";
 import Swipeable from "./Swipeable";
+import LazyImage from "./LazyImage";
+import Button from "./Button";
 
 function mapItems(items) {
   return items.map((item) => ({
@@ -23,6 +25,9 @@ export default function Films({ navigation }) {
   const [items, setItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [imageSource, setImageSource] = useState(null);
+  const remote =
+    "https://upload.wikimedia.org/wikipedia/en/8/87/StarWarsMoviePoster1977.jpg";
 
   useEffect(() => {
     fetch("https://www.swapi.tech/api/films")
@@ -47,6 +52,20 @@ export default function Films({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <View style={styles.imageContainer}>
+        <LazyImage
+          style={styles.lazyImage}
+          resizeMode="contain"
+          source={imageSource}
+        />
+        <Button
+          label="Load Poster"
+          onPress={() => {
+            setImageSource({ uri: remote });
+          }}
+        />
+      </View>
+
       <Input
         label="Search Film"
         placeholder="Enter a film title"
@@ -58,7 +77,7 @@ export default function Films({ navigation }) {
         <View style={styles.modalContainer}>
           <View style={styles.modalInner}>
             <Text>{searchTerm}</Text>
-            <Button title="Close" onPress={() => setModalVisible(false)} />
+            <Button label="Close" onPress={() => setModalVisible(false)} />
           </View>
         </View>
       </Modal>
