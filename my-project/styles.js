@@ -7,8 +7,8 @@ export default StyleSheet.create({
     paddingTop: 40,
   },
   item: {
-    margin: 5,
-    padding: 5,
+    margin: 10,
+    padding: 10,
     color: "slategrey",
     backgroundColor: "ghostwhite",
     textAlign: "center",
@@ -40,5 +40,28 @@ export default StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
   },
-  
+  swipeContainer: {
+    height: 80,
+    marginVertical: 6,
+    backgroundColor: "white",
+    overflow: "hidden",
+  },
+
+  swipeItem: {
+    width: 400,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#eef",
+    height: "100%",
+    borderRadius: 8,
+  },
+
+  swipeBlank: {
+    width: 400,
+  },
+
+  swipeItemText: {
+    fontSize: 18,
+    color: "#444",
+  },
 });

@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, Modal, Button, TextInput } from "react-native";
+import { View, Text, Modal, Button, TextInput, ScrollView } from "react-native";
 import styles from "./styles";
+import Swipeable from "./Swipeable";
 
 function mapItems(items) {
   return items.map((item) => ({
-    key: item.uid,      
-    value: item.name     
+    id: item.uid, 
+    name: item.name,
   }));
 }
+
 function Input(props) {
   return (
     <View style={styles.textInputContainer}>
@@ -18,7 +20,7 @@ function Input(props) {
 }
 
 export default function Planet({ navigation }) {
-  const [data, setData] = useState([]);
+  const [items, setItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -27,13 +29,19 @@ export default function Planet({ navigation }) {
       .then((resp) => resp.json())
       .then(({ results }) => {
         const mapped = mapItems(results);
-        setData(mapped);
+        setItems(mapped);
       })
       .catch((err) => console.error("Fetch failed:", err));
   }, []);
 
   const handleSubmit = (e) => {
     setSearchTerm(e.nativeEvent.text);
+    setModalVisible(true);
+  };
+
+  const handleSwipe = (id, name) => {
+    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
+    setSearchTerm(name);
     setModalVisible(true);
   };
 
@@ -49,16 +57,21 @@ export default function Planet({ navigation }) {
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalInner}>
-            <Text>You entered: {searchTerm}</Text>
+            <Text> {searchTerm}</Text>
             <Button title="Close" onPress={() => setModalVisible(false)} />
           </View>
         </View>
       </Modal>
 
-      <FlatList
-        data={data}
-        renderItem={({ item }) => <Text style={styles.item}>{item.value}</Text>}
-      />
+      <ScrollView>
+        {items.map((item) => (
+          <Swipeable
+            key={item.id}
+            name={item.name}
+            onSwipe={() => handleSwipe(item.id, item.name)}
+          />
+        ))}
+      </ScrollView>
     </View>
   );
 }
