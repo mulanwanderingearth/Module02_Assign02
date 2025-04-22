@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, Modal, Button, TextInput, ScrollView } from "react-native";
 import styles from "./styles";
 import Swipeable from "./Swipeable";
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 function mapItems(items) {
   return items.map((item) => ({
@@ -57,7 +58,9 @@ export default function Films({ navigation }) {
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalInner}>
-            <Text>{searchTerm}</Text>
+          <Animated.View entering={FadeInDown.duration(1000)}>
+        <Text>{searchTerm}</Text>
+      </Animated.View>
             <Button title="Close" onPress={() => setModalVisible(false)} />
           </View>
         </View>
