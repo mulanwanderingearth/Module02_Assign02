@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, Modal, Button, TextInput, ScrollView } from "react-native";
 import styles from "./styles";
 import Swipeable from "./Swipeable";
+import NetInfo from "@react-native-community/netinfo";
 
 function mapItems(items) {
   return items.map((item) => ({
@@ -18,6 +19,13 @@ function Input(props) {
     </View>
   );
 }
+const connectedMap = {
+  none: "Disconnected",
+  unknown: "Disconnected",
+  wifi: "Connected",
+  cell: "Connected",
+  mobile: "Connected",
+};
 
 export default function Films({ navigation }) {
   const [items, setItems] = useState([]);
@@ -44,9 +52,27 @@ export default function Films({ navigation }) {
     setSearchTerm(name);
     setModalVisible(true);
   };
+  const [connected, setConnected] = useState("");
+
+  useEffect(() => {
+    function onNetworkChange(state) {
+      if (state.isConnected) {
+        setConnected("Connected");
+      } else {
+        setConnected("Disconnected");
+      }
+    }
+  
+    const unsubscribe = NetInfo.addEventListener(onNetworkChange);
+  
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   return (
     <View style={styles.container}>
+      <Text>{connected}</Text>
       <Input
         label="Search Film"
         placeholder="Enter a film title"

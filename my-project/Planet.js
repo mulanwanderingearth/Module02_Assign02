@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { View, Text, Modal, Button, TextInput, ScrollView } from "react-native";
 import styles from "./styles";
 import Swipeable from "./Swipeable";
-
+import NetInfo from "@react-native-community/netinfo";
 function mapItems(items) {
   return items.map((item) => ({
-    id: item.uid, 
+    id: item.uid,
     name: item.name,
   }));
 }
@@ -45,8 +45,26 @@ export default function Planet({ navigation }) {
     setModalVisible(true);
   };
 
+  const [connected, setConnected] = useState("");
+
+  useEffect(() => {
+    function onNetworkChange(state) {
+      if (state.isConnected) {
+        setConnected("Connected");
+      } else {
+        setConnected("Disconnected");
+      }
+    }
+
+    const unsubscribe = NetInfo.addEventListener(onNetworkChange);
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
   return (
     <View style={styles.container}>
+       <Text>{connected}</Text>
       <Input
         label="Search Planet"
         placeholder="Enter a planet name"
