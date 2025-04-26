@@ -72,7 +72,18 @@ export default function Films({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text>{connected}</Text>
+      {connected && (
+  <Text
+    style={[
+      styles.statusText,
+      { color: connected === "Connected" ? 'black' : 'red' },
+    ]}
+  >
+    {connected === "Connected"
+      ? "Connected"
+      : "No Internet Connection. Please check your network settings."}
+  </Text>
+)}
       <Input
         label="Search Film"
         placeholder="Enter a film title"

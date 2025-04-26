@@ -64,4 +64,6 @@ export default StyleSheet.create({
     fontSize: 18,
     color: "#444",
   },
+  
+  
 });

@@ -66,7 +66,18 @@ export default function Spaceships({ navigation }) {
 
   return (
     <View style={styles.container}>
-       <Text>{connected}</Text>
+      {connected && (
+  <Text
+    style={[
+      styles.statusText,
+      { color: connected === "Connected" ? 'black' : 'red' },
+    ]}
+  >
+    {connected === "Connected"
+      ? "Connected"
+      : "No Internet Connection. Please check your network settings."}
+  </Text>
+)}
       <Input
         label="Search Spaceship"
         placeholder="Enter a spaceship name"
