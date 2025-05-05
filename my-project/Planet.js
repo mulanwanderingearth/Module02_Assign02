@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import { View, Text, Modal, Button, TextInput, ScrollView } from "react-native";
 import styles from "./styles";
 import Swipeable from "./Swipeable";
+import PlanetDetail from "./PlanetDetail";
 
 function mapItems(items) {
   return items.map((item) => ({
-    id: item.uid, 
+    id: item.uid,
     name: item.name,
   }));
 }
@@ -40,9 +41,7 @@ export default function Planet({ navigation }) {
   };
 
   const handleSwipe = (id, name) => {
-    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
-    setSearchTerm(name);
-    setModalVisible(true);
+    navigation.navigate("PlanetDetail", { id, name });
   };
 
   return (
