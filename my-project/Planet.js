@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Modal, Button, TextInput, ScrollView } from "react-native";
+import { View, Text, TextInput, ScrollView, StyleSheet } from "react-native";
 import styles from "./styles";
 import Swipeable from "./Swipeable";
-import PlanetDetail from "./PlanetDetail";
 
 function mapItems(items) {
   return items.map((item) => ({
@@ -22,8 +21,8 @@ function Input(props) {
 
 export default function Planet({ navigation }) {
   const [items, setItems] = useState([]);
+  const [filteredItems, setFilteredItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     fetch("https://www.swapi.tech/api/planets")
@@ -31,17 +30,25 @@ export default function Planet({ navigation }) {
       .then(({ results }) => {
         const mapped = mapItems(results);
         setItems(mapped);
+        setFilteredItems(mapped);
       })
       .catch((err) => console.error("Fetch failed:", err));
   }, []);
 
-  const handleSubmit = (e) => {
-    setSearchTerm(e.nativeEvent.text);
-    setModalVisible(true);
+  const handleSearch = (text) => {
+    setSearchTerm(text);
+    if (!text) {
+      setFilteredItems(items);
+    } else {
+      const filtered = items.filter((item) =>
+        item.name.toLowerCase().includes(text.toLowerCase())
+      );
+      setFilteredItems(filtered);
+    }
   };
 
-  const handleSwipe = (id, name) => {
-    navigation.navigate("PlanetDetail", { id, name });
+  const handleSwipe = (id) => {
+    navigation.navigate("PlanetDetail", { id });
   };
 
   return (
@@ -49,28 +56,30 @@ export default function Planet({ navigation }) {
       <Input
         label="Search Planet"
         placeholder="Enter a planet name"
-        returnKeyType="search"
-        onSubmitEditing={handleSubmit}
+        value={searchTerm}
+        onChangeText={handleSearch}
       />
-
-      <Modal visible={modalVisible} transparent animationType="slide">
-        <View style={styles.modalContainer}>
-          <View style={styles.modalInner}>
-            <Text> {searchTerm}</Text>
-            <Button title="Close" onPress={() => setModalVisible(false)} />
-          </View>
-        </View>
-      </Modal>
-
       <ScrollView>
-        {items.map((item) => (
+        {filteredItems.map((item) => (
           <Swipeable
             key={item.id}
             name={item.name}
-            onSwipe={() => handleSwipe(item.id, item.name)}
+            onSwipe={() => handleSwipe(item.id)}
           />
         ))}
+        {filteredItems.length === 0 && (
+          <Text style={localStyles.noResult}>No results found.</Text>
+        )}
       </ScrollView>
     </View>
   );
 }
+
+const localStyles = StyleSheet.create({
+  noResult: {
+    textAlign: "center",
+    color: "#888",
+    marginTop: 30,
+    fontSize: 18,
+  },
+});

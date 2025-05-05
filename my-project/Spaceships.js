@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Modal, Button, TextInput, ScrollView } from "react-native";
+import { View, Text, TextInput, ScrollView, StyleSheet } from "react-native";
 import styles from "./styles";
 import Swipeable from "./Swipeable";
 
@@ -21,28 +21,35 @@ function Input(props) {
 
 export default function Spaceships({ navigation }) {
   const [items, setItems] = useState([]);
+  const [filteredItems, setFilteredItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
-    fetch("https://www.swapi.tech/api/starships/")
+    fetch("https://www.swapi.tech/api/starships")
       .then((resp) => resp.json())
       .then(({ results }) => {
         const mapped = mapItems(results);
         setItems(mapped);
+        setFilteredItems(mapped);
       })
       .catch((err) => console.error("Fetch failed:", err));
   }, []);
 
-  const handleSubmit = (e) => {
-    setSearchTerm(e.nativeEvent.text);
-    setModalVisible(true);
+  const handleSearch = (text) => {
+    setSearchTerm(text);
+    if (!text) {
+      setFilteredItems(items);
+    } else {
+      const filtered = items.filter((item) =>
+        item.name.toLowerCase().includes(text.toLowerCase())
+      );
+      setFilteredItems(filtered);
+    }
   };
 
-  const handleSwipe = (id, name) => {
-    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
-    setSearchTerm(name);
-    setModalVisible(true);
+  const handleSwipe = (id) => {
+    setFilteredItems((prev) => prev.filter((item) => item.id !== id));
+    setItems((prev) => prev.filter((item) => item.id !== id));
   };
 
   return (
@@ -50,28 +57,30 @@ export default function Spaceships({ navigation }) {
       <Input
         label="Search Spaceship"
         placeholder="Enter a spaceship name"
-        returnKeyType="search"
-        onSubmitEditing={handleSubmit}
+        value={searchTerm}
+        onChangeText={handleSearch}
       />
-
-      <Modal visible={modalVisible} transparent animationType="slide">
-        <View style={styles.modalContainer}>
-          <View style={styles.modalInner}>
-            <Text>{searchTerm}</Text>
-            <Button title="Close" onPress={() => setModalVisible(false)} />
-          </View>
-        </View>
-      </Modal>
-
       <ScrollView>
-        {items.map((item) => (
+        {filteredItems.map((item) => (
           <Swipeable
             key={item.id}
             name={item.name}
-            onSwipe={() => handleSwipe(item.id, item.name)}
+            onSwipe={() => handleSwipe(item.id)}
           />
         ))}
+        {filteredItems.length === 0 && (
+          <Text style={localStyles.noResult}>No results found.</Text>
+        )}
       </ScrollView>
     </View>
   );
 }
+
+const localStyles = StyleSheet.create({
+  noResult: {
+    textAlign: "center",
+    color: "#888",
+    marginTop: 30,
+    fontSize: 18,
+  },
+});
